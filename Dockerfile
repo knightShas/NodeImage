@@ -90,6 +90,10 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   # smoke test
   && yarn --version
 
+# RUN npm install -g npm@9.4.2
+# RUN npm update --prefix /usr/local/lib/node_modules/npm tar && rm -rf /usr/local/lib/node_modules/npm/node_modules/node-gyp/test/fixtures/server.key && rm -rf /usr/local/lib/node_modules/npm/node_modules/node-gyp/test/fixtures/*.crt && apk update && apk upgrade apk-tools && apk add curl busybox busybox-extras sudo tzdata && echo '%wheel ALL=(ALL) ALL' > /etc/sudoers && adduser awsuser wheel
+# RUN sudo apk upgradeENV
+
 ENV TZ="Asia/Kolkata"
 
 COPY docker-entrypoint.sh /usr/local/bin/
