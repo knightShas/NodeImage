@@ -1,9 +1,9 @@
 FROM alpine:3.16
 
-ENV NODE_VERSION 19.6.0
+ENV NODE_VERSION 19.8.1
 
-RUN addgroup -g 1006 awsuser \
-    && adduser -u 1006 -G root -s /bin/sh -D awsuser \
+RUN addgroup -g 1000 node \
+    && adduser -u 1000 -G node -s /bin/sh -D node \
     && apk add --no-cache \
         libstdc++ \
     && apk add --no-cache --virtual .build-deps \
@@ -12,7 +12,7 @@ RUN addgroup -g 1006 awsuser \
       && case "${alpineArch##*-}" in \
         x86_64) \
           ARCH='x64' \
-          CHECKSUM="fcf7c5c876cacabc8d4559ee3d4b7a2de83804e036ba89a80d3bd602f5f6fa97" \
+          CHECKSUM="3106608fc62f92519578148e872a6862f36ea7b1ef6ac7c1475e2064fe65a9c6" \
           ;; \
         *) ;; \
       esac \
@@ -39,6 +39,7 @@ RUN addgroup -g 1006 awsuser \
       4ED778F539E3634C779C87C6D7062848A1AB005C \
       141F07595B7B3FFE74309A937405533BE57C7D57 \
       74F12602B6F1C4E913FAA37AD3A89613643B6201 \
+      DD792F5973C6DE52C432CBDAC77ABFA00DDBF2B7 \
       61FC681DFB92A079F1685E77973F295594EC4689 \
       8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600 \
       C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
