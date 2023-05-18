@@ -2,8 +2,8 @@ FROM alpine:3.16
 
 ENV NODE_VERSION 19.6.0
 
-RUN addgroup -g 1006 awsuser \
-    && adduser -u 1006 -G root -s /bin/sh -D awsuser \
+RUN addgroup -g 1000 awsuser \
+    && adduser -u 1000 -G root -s /bin/sh -D awsuser \
     && apk add --no-cache \
         libstdc++ \
     && apk add --no-cache --virtual .build-deps \
