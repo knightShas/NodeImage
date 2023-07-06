@@ -1,9 +1,9 @@
-FROM alpine:3.16
+FROM alpine:3.17
 
-ENV NODE_VERSION 19.6.0
+ENV NODE_VERSION 20.3.1
 
-RUN addgroup -g 1000 awsuser \
-    && adduser -u 1000 -G root -s /bin/sh -D awsuser \
+RUN addgroup -g 1000 node \
+    && adduser -u 1000 -G node -s /bin/sh -D node \
     && apk add --no-cache \
         libstdc++ \
     && apk add --no-cache --virtual .build-deps \
@@ -12,7 +12,7 @@ RUN addgroup -g 1000 awsuser \
       && case "${alpineArch##*-}" in \
         x86_64) \
           ARCH='x64' \
-          CHECKSUM="fcf7c5c876cacabc8d4559ee3d4b7a2de83804e036ba89a80d3bd602f5f6fa97" \
+          CHECKSUM="7317d150f4c37570f2c8967492f58e0dcc65487548eb59f6e7ec80deb12a5a23" \
           ;; \
         *) ;; \
       esac \
@@ -34,11 +34,14 @@ RUN addgroup -g 1000 awsuser \
         linux-headers \
         make \
         python3 \
+    # use pre-existing gpg directory, see https://github.com/nodejs/docker-node/pull/1895#issuecomment-1550389150
+    && export GNUPGHOME="$(mktemp -d)" \
     # gpg keys listed at https://github.com/nodejs/node#release-keys
     && for key in \
       4ED778F539E3634C779C87C6D7062848A1AB005C \
       141F07595B7B3FFE74309A937405533BE57C7D57 \
       74F12602B6F1C4E913FAA37AD3A89613643B6201 \
+      DD792F5973C6DE52C432CBDAC77ABFA00DDBF2B7 \
       61FC681DFB92A079F1685E77973F295594EC4689 \
       8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600 \
       C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
@@ -52,6 +55,8 @@ RUN addgroup -g 1000 awsuser \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.xz" \
     && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
     && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+    && gpgconf --kill all \
+    && rm -rf "$GNUPGHOME" \
     && grep " node-v$NODE_VERSION.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
     && tar -xf "node-v$NODE_VERSION.tar.xz" \
     && cd "node-v$NODE_VERSION" \
@@ -67,11 +72,14 @@ RUN addgroup -g 1000 awsuser \
   && apk del .build-deps \
   # smoke tests
   && node --version \
-  && npm --version
+  && npm --version \
+  && apk add ca-certificates && update-ca-certificates
 
 ENV YARN_VERSION 1.22.19
 
 RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
+  # use pre-existing gpg directory, see https://github.com/nodejs/docker-node/pull/1895#issuecomment-1550389150
+  && export GNUPGHOME="$(mktemp -d)" \
   && for key in \
     6A010C5166006599AA17F08146C2130DFD2497F5 \
   ; do \
@@ -81,6 +89,8 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
   && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
   && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
+  && gpgconf --kill all \
+  && rm -rf "$GNUPGHOME" \
   && mkdir -p /opt \
   && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
@@ -89,12 +99,6 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   && apk del .build-deps-yarn \
   # smoke test
   && yarn --version
-
-# RUN npm install -g npm@9.4.2
-# RUN npm update --prefix /usr/local/lib/node_modules/npm tar && rm -rf /usr/local/lib/node_modules/npm/node_modules/node-gyp/test/fixtures/server.key && rm -rf /usr/local/lib/node_modules/npm/node_modules/node-gyp/test/fixtures/*.crt && apk update && apk upgrade apk-tools && apk add curl busybox busybox-extras sudo tzdata && echo '%wheel ALL=(ALL) ALL' > /etc/sudoers && adduser awsuser wheel
-# RUN sudo apk upgradeENV
-
-ENV TZ="Asia/Kolkata"
 
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
