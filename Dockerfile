@@ -1,6 +1,6 @@
 FROM alpine:3.18
 
-ENV NODE_VERSION 20.8.0
+ENV NODE_VERSION 21.1.0
 
 RUN addgroup -g 1000 node \
     && adduser -u 1000 -G node -s /bin/sh -D node \
@@ -12,7 +12,7 @@ RUN addgroup -g 1000 node \
       && case "${alpineArch##*-}" in \
         x86_64) \
           ARCH='x64' \
-          CHECKSUM="31e1b7e011ede1a6de2e1185228cfbd3a2ea4c5639ae6bc3e4357efa69f7a2b2" \
+          CHECKSUM="987dac3f01a5b81bd3674edcf984161ed145995f2f11e7b5893249af5fa237e8" \
           ;; \
         *) ;; \
       esac \
@@ -73,7 +73,7 @@ RUN addgroup -g 1000 node \
   && apk del .build-deps \
   # smoke tests
   && node --version \
-  && npm --version 
+  && npm --version
 
 ENV YARN_VERSION 1.22.19
 
