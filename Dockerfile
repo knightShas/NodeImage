@@ -74,6 +74,10 @@ RUN addgroup -g 1000 node \
   # smoke tests
   && node --version \
   && npm --version 
+  
+RUN apk add --no-cache openssl \
+  libressl \
+  curl
 
 ENV YARN_VERSION 1.22.19
 
@@ -99,9 +103,6 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   && apk del .build-deps-yarn \
   # smoke test
   && yarn --version
-
-RUN apk add libressl \
-  curl
 
 RUN apk add ca-certificates && update-ca-certificates
 
