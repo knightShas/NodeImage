@@ -112,7 +112,8 @@ RUN apk add ca-certificates && update-ca-certificates \
   && rm -rf node_modules package-lock.json \
   && cd /root \
   && rm -rf .cache .npm \
-  && apk add --upgrade openssl
+  && apk add --upgrade openssl \
+  && apk add curl
 
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
