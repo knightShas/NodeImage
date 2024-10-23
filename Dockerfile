@@ -1,6 +1,6 @@
 FROM alpine:3.18
 
-ENV NODE_VERSION 20.10.0
+ENV NODE_VERSION 20.13.0
 
 RUN addgroup -g 1000 node \
     && adduser -u 1000 -G node -s /bin/sh -D node \
@@ -10,7 +10,7 @@ RUN addgroup -g 1000 node \
         curl \
     && ARCH= OPENSSL_ARCH='linux*' && alpineArch="$(apk --print-arch)" \
       && case "${alpineArch##*-}" in \
-        x86_64) ARCH='x64' CHECKSUM="2c654df3615ed02dc1994f58bdbc6b5cd37fdc01f695188388326f12c753f01b" OPENSSL_ARCH=linux-x86_64;; \
+        x86_64) ARCH='x64' CHECKSUM="a4b7f5281fa4616216e823f013b051c9328f7f3f73423460b6300758475fcc4c" OPENSSL_ARCH=linux-x86_64;; \
         x86) OPENSSL_ARCH=linux-elf;; \
         aarch64) OPENSSL_ARCH=linux-aarch64;; \
         arm*) OPENSSL_ARCH=linux-armv4;; \
@@ -105,18 +105,19 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   && yarn --version
 
 RUN apk add ca-certificates && update-ca-certificates \
-  && cd /usr/local/lib/node_modules/npm/node_modules/ip \
-  && sed -i 's/"version": "2.0.0"/"version": "2.0.1"/g' package.json \
-  && npm install \
-  && rm -rf node_modules package-lock.json \
-  && cd /usr/local/lib/node_modules/npm/node_modules/tar \
-  && sed -i 's/"version": "6.2.0"/"version": "6.2.1"/g' package.json \
-  && npm install \
-  && rm -rf node_modules package-lock.json \
-  && cd /root \
-  && rm -rf .cache .npm \
-  && apk add --upgrade openssl \
-  && apk add curl
+  && apk add --no-cache openssl \
+  && apk --no-cache upgrade busybox \
+  && apk add --no-cache curl 
+  # && cd /usr/local/lib/node_modules/npm/node_modules/ip \
+  # && sed -i 's/"version": "2.0.0"/"version": "2.0.1"/g' package.json \
+  # && npm install \
+  # && rm -rf node_modules package-lock.json \
+  # && cd /usr/local/lib/node_modules/npm/node_modules/tar \
+  # && sed -i 's/"version": "6.2.0"/"version": "6.2.1"/g' package.json \
+  # && npm install \
+  # && rm -rf node_modules package-lock.json \
+  # && cd /root \
+  # && rm -rf .cache .npm \
 
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
