@@ -107,17 +107,17 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 RUN apk add ca-certificates && update-ca-certificates \
   && apk add --no-cache openssl \
   && apk --no-cache upgrade busybox \
-  && apk add --no-cache curl 
+  && apk add --no-cache curl \
   # && cd /usr/local/lib/node_modules/npm/node_modules/ip \
   # && sed -i 's/"version": "2.0.0"/"version": "2.0.1"/g' package.json \
   # && npm install \
   # && rm -rf node_modules package-lock.json \
-  # && cd /usr/local/lib/node_modules/npm/node_modules/tar \
-  # && sed -i 's/"version": "6.2.0"/"version": "6.2.1"/g' package.json \
-  # && npm install \
-  # && rm -rf node_modules package-lock.json \
-  # && cd /root \
-  # && rm -rf .cache .npm \
+  && cd /usr/local/lib/node_modules/npm/node_modules/cross-spawn \
+  && sed -i 's/"version": "7.0.3"/"version": "7.0.5"/g' package.json \
+  && npm install \
+  && rm -rf node_modules package-lock.json \
+  && cd /root \
+  && rm -rf .cache .npm 
 
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
